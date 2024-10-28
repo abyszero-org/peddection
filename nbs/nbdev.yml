@@ -1,0 +1,9 @@
+project:
+  output-dir: _docs
+
+website:
+  title: "peddection"
+  site-url: "https://abyszero-org.github.io/peddection"
+  description: "Explore the KITTI dataset, and output ONNX models for object detection."
+  repo-branch: main
+  repo-url: "https://github.com/abyszero-org/peddection"
