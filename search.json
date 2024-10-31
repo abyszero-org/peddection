@@ -1,0 +1,72 @@
+[
+  {
+    "objectID": "tech_check.html",
+    "href": "tech_check.html",
+    "title": "00 Tech Check",
+    "section": "",
+    "text": "import matplotlib.pyplot as plt\nfrom mpl_toolkits import mplot3d\nimport numpy as np\nimport open3d as o3d\nimport plotly.graph_objects as go\n\nJupyter environment detected. Enabling Open3D WebVisualizer.\n[Open3D INFO] WebRTC GUI backend enabled.\n[Open3D INFO] WebRTCWindowSystem: HTTP handshake server disabled.\n\n\n\nply_point_cloud = o3d.data.PLYPointCloud()\ncloud = o3d.io.read_point_cloud(ply_point_cloud.path)\ncloud.estimate_normals(\n    search_param = o3d.geometry.KDTreeSearchParamHybrid(radius = 0.1, max_nn = 30)\n)\npoints = np.asarray(cloud.points)\n\n\ncolors = None\nif cloud.has_colors():\n  colors = np.asarray(cloud.colors)\nelif cloud.has_normals():\n  colors = (0.5, 0.5, 0.5) + np.asarray(cloud.normals) * 0.5\nelse:\n  colors = np.zeros((3, 1), dtype=np.float64) \n  cloud.paint_uniform_color(colors)\n\n\nfig = go.Figure(\n    data=[\n        go.Scatter3d(\n            x=points[:, 0], y = points[:, 1], z=points[:, 2],\n            mode = 'markers',\n            marker = dict(size=1, color=colors)\n        )\n    ],\n    layout=dict( \n        scene=dict(\n            xaxis = dict(visible = False),\n            yaxis = dict(visible = False),\n            zaxis = dict(visible = False)\n        )\n    )\n)\nfig.show()",
+    "crumbs": [
+      "00 Tech Check"
+    ]
+  },
+  {
+    "objectID": "kitti_explore.html",
+    "href": "kitti_explore.html",
+    "title": "01 Exploring KITTI",
+    "section": "",
+    "text": "len(ds.get_split(\"train\"))\n\n3712\n\n\n\nfrom collections import defaultdict\ncounts = defaultdict(int)\n\nfor label in (KITTI_ROOT/\"training\"/\"label_2\").glob(\"*\"):\n    num     = label.stem\n    calib   = ds.read_calib(KITTI_ROOT/\"training\"/\"calib\"/(num+\".txt\"))\n    label:List[o3d._ml3d.datasets.kitti.Object3d] = ds.read_label(label, calib)\n    for box in label:\n        counts[box.label_class] += 1\n\n\ncounts\n\ndefaultdict(int,\n            {'Car': 28742,\n             'DontCare': 13873,\n             'Van': 2914,\n             'Pedestrian': 4487,\n             'Cyclist': 1627,\n             'Person_sitting': 222})\n\n\n\nsource\n\nloadVeloAsPcd\n\n loadVeloAsPcd (fname:Union[str,os.PathLike])\n\n\nnum:str = \"000000\"\nfname   = KITTI_ROOT/\"training\"/\"velodyne_reduced\"/(num+\".bin\")\ncloud   = loadVeloAsPcd(fname)\ncloud\n\nPointCloud on CPU:0 [20285 points (Float32)].\nAttributes: color_gradients (dtype = Float32, shape = {20285, 3}), colors (dtype = Float32, shape = {20285, 3}), normals (dtype = Float32, shape = {20285, 3}), intensities (dtype = Float32, shape = {20285}).\n\n\n\nsource\n\n\nplotCloud\n\n plotCloud (cloud:open3d.cpu.pybind.t.geometry.PointCloud,\n            boxes:Iterable[open3d._ml3d.datasets.kitti.Object3d]=[])\n\n\nfig = plotCloud(cloud)\nfig.show()\n\n                                                \n\n\n\nimage = KITTI_ROOT/\"training\"/\"image_2\"/(num+\".png\")\nwith Image.open(image) as png:\n    png.show()\n\n\n\n\n\n\n\n\n\ncalib = ds.read_calib(KITTI_ROOT/\"training\"/\"calib\"/(num+\".txt\"))\ncalib\n\n{'world_cam': array([[-0.0015961 , -0.00527065,  0.9999848 ,  0.        ],\n        [-0.99991626,  0.0128487 , -0.00152827,  0.        ],\n        [-0.01284044, -0.99990356, -0.00529071,  0.        ],\n        [-0.02236671, -0.05967891, -0.332549  ,  1.        ]],\n       dtype=float32),\n 'cam_img': array([[ 7.070493e+02,  0.000000e+00,  0.000000e+00,  0.000000e+00],\n        [ 0.000000e+00,  7.070493e+02,  0.000000e+00,  0.000000e+00],\n        [ 6.040814e+02,  1.805066e+02,  1.000000e+00,  1.000000e+00],\n        [ 4.575831e+01, -3.454157e-01,  4.981016e-03,  0.000000e+00]],\n       dtype=float32)}\n\n\n\n# TODO: Project this correctly in to the 3D plot\nlabel = KITTI_ROOT/\"training\"/\"label_2\"/(num+\".txt\")\nlabel:List[o3d._ml3d.datasets.kitti.Object3d] = ds.read_label(label, calib)\nlabel[0].generate_corners3d()\n\narray([[-4.9337853 ,  1.84000001, 79.32568998],\n       [-3.20378585,  1.84000001, 79.32431234],\n       [-3.20621464,  1.84000001, 76.27431331],\n       [-4.93621409,  1.84000001, 76.27569095],\n       [-4.9337853 ,  0.18000001, 79.32568998],\n       [-3.20378585,  0.18000001, 79.32431234],\n       [-3.20621464,  0.18000001, 76.27431331],\n       [-4.93621409,  0.18000001, 76.27569095]])\n\n\n\ncounts\n\ndefaultdict(int,\n            {'Car': 28742,\n             'DontCare': 13873,\n             'Van': 2914,\n             'Pedestrian': 4487,\n             'Cyclist': 1627,\n             'Person_sitting': 222})",
+    "crumbs": [
+      "01 Exploring KITTI"
+    ]
+  },
+  {
+    "objectID": "kitti_dl.html",
+    "href": "kitti_dl.html",
+    "title": "02 Load KITTI for Training",
+    "section": "",
+    "text": "ds = o3d.ml.datasets.KITTI(KITTI_ROOT)\n\n\nnum = \"000000\"\nlabel = KITTI_ROOT/\"training\"/\"label_2\"/(num+\".txt\")\ncalib = ds.read_calib(KITTI_ROOT/\"training\"/\"calib\"/(num+\".txt\"))\nds.read_label(label, calib)\n\n[box:1 (class=Pedestrian, conf=-1.0)]\n\n\n\ndl = DataLoader(ds.get_split(\"test\"))\nlen(dl)",
+    "crumbs": [
+      "02 Load KITTI for Training"
+    ]
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "peddection",
+    "section": "",
+    "text": "This file will become your README and also the index of your documentation.",
+    "crumbs": [
+      "peddection"
+    ]
+  },
+  {
+    "objectID": "index.html#developer-guide",
+    "href": "index.html#developer-guide",
+    "title": "peddection",
+    "section": "Developer Guide",
+    "text": "Developer Guide\nIf you are new to using nbdev here are some useful pointers to get you started.\n\nInstall peddection in Development mode\n# make sure peddection package is installed in development mode\n$ pip install -e .\n\n# make changes under nbs/ directory\n# ...\n\n# compile to have changes apply to peddection\n$ nbdev_prepare",
+    "crumbs": [
+      "peddection"
+    ]
+  },
+  {
+    "objectID": "index.html#usage",
+    "href": "index.html#usage",
+    "title": "peddection",
+    "section": "Usage",
+    "text": "Usage\n\nInstallation\nInstall latest from the GitHub repository:\n$ pip install git+https://github.com/abyszero-org/peddection.git\nor from conda\n$ conda install -c abyszero-org peddection\nor from pypi\n$ pip install peddection\n\n\nDocumentation\nDocumentation can be found hosted on this GitHub repository’s pages. Additionally you can find package manager specific guidelines on conda and pypi respectively.",
+    "crumbs": [
+      "peddection"
+    ]
+  },
+  {
+    "objectID": "index.html#how-to-use",
+    "href": "index.html#how-to-use",
+    "title": "peddection",
+    "section": "How to use",
+    "text": "How to use\nFill me in please! Don’t forget code examples:\n\n1+1\n\n2",
+    "crumbs": [
+      "peddection"
+    ]
+  }
+]
